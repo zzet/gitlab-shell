@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "Sending changes to PXE..."
+
+ssh pxe@pxe.undev.cc "cd /home/pxe/preseed/; git pull 2>/dev/null"

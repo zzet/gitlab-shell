@@ -1,0 +1,85 @@
+#!/bin/bash
+
+GIT_REPO_URI="git@gitlab.platform.home:flash-player/coreplayer.git"
+
+function exit_fail() {
+  echo "[FAIL] (On step: $1)"
+  exit 1
+}
+
+function rebuild_player() {
+  tag=$1
+
+  echo -n "=> Rebuilding player... "
+
+  work_dir="/tmp/$$"
+  mkdir -p $work_dir &>/dev/null || {
+    exit_fail "Create work_dir"
+  }
+
+  git clone $GIT_REPO_URI $work_dir/git_repo &>/dev/null || {
+    exit_fail "Clone git repo"
+  }
+
+  GIT_CMD="git --git-dir=$work_dir/git_repo/.git"
+
+  _root_dir=$(pwd)
+  cd $work_dir/git_repo/
+  $GIT_CMD checkout $tag &>/dev/null || {
+    exit_fail "Checkout tag: [$tag]"
+  }
+  cd ./CorePlayer
+
+  sed -ie "s/%VERSION%/$tag/" src/Version.as
+
+  bash build.sh &>/dev/null || {
+    exit_fail "Build player"
+  }
+  bash build.sh debug &>/dev/null || {
+    exit_fail "Build debug player"
+  }
+
+  cd ..
+
+  $GIT_CMD add -f ./CorePlayer/bin-release/CorePlayer.swf \
+ ./CorePlayer/bin-debug/CorePlayer.swf &>/dev/null || {
+    exit_fail "Add new bin / debug release"
+  }
+  $GIT_CMD commit -m "Add new bin / debug release: CorePlayer.swf [$tag]" &>/dev/null || {
+    exit_fail "Commit release"
+  }
+  $GIT_CMD tag -f $tag &>/dev/null || {
+    exit_fail "Recreate tag"
+  }
+  $GIT_CMD push origin $tag &>/dev/null || {
+    exit_fail "Push new tag to origin"
+  }
+
+  cd $_root_dir
+
+  echo "[OK]"
+}
+
+while read line; do
+  params=( $line )
+  old_version=${params[0]}
+  new_version=${params[1]}
+  ref_name=${params[2]}
+
+  case $ref_name in
+    refs/tags*)
+
+    if [ "$old_version" != "0000000000000000000000000000000000000000" ]; then
+      # force update tag. do nothing
+      echo -n ''
+    else
+      rebuild_player ${ref_name##*/}
+    fi
+
+    ;;
+    *)
+      # do nothing
+      echo -n ''
+    ;;
+  esac
+done < /dev/stdin
