@@ -7,4 +7,11 @@ group :development do
   gem 'guard'
   gem 'guard-rspec'
   gem 'vcr'
+
+  # Deploy with Capistrano
+  gem "capi"
+  gem 'capistrano'
+  gem 'rvm-capistrano'
+  gem 'capistrano-ext'
+  gem 'capistrano-maintenance'
 end
