@@ -32,6 +32,7 @@ class GitlabProjects
     when 'rm-project';  rm_project
     when 'mv-project';  mv_project
     when 'import-project'; import_project
+    when 'fork-project'; fork_project
     else
       puts 'not allowed'
       false
@@ -100,6 +101,18 @@ class GitlabProjects
   # Disable acceess to repository via git://githost/project_name_with_namespace.git
   def disable_git_protocol
     cmd = "rm #{full_path}/git-daemon-export-ok"
+    system(cmd)
+  end
+
+  def fork_project
+    new_namespace = ARGV.shift
+
+    return false unless new_namespace
+
+    namespaced_path = File.join(repos_path, new_namespace)
+    return false unless File.exists?(namespaced_path)
+
+    cmd = "cd #{namespaced_path} && git clone --bare #{@full_path}"
     system(cmd)
   end
 end
