@@ -17,3 +17,10 @@ auth_file: "/home/git/.ssh/authorized_keys"
 
 # gitlab-shell path
 gitlab_shell_path: "/home/git/gitlab-shell"
+
+# Redis settings used for pushing commit notices to gitlab
+redis:
+  bin: /usr/bin/redis-cli
+  host: 127.0.0.1
+  port: 6379
+  namespace: resque:gitlab

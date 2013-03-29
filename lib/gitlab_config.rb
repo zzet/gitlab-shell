@@ -26,4 +26,8 @@ class GitlabConfig
   def http_settings
     @config['http_settings'] ||= {}
   end
+
+  def redis
+    @config['redis'] ||= {}
+  end
 end
