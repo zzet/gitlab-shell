@@ -7,6 +7,10 @@ class GitlabConfig
     @config = YAML.load_file(File.join(ROOT_PATH, 'config.yml'))
   end
 
+  def gitlab_shell_path
+    @config['gitlab_shell_path'] ||= "/home/git/gitlab-shell"
+  end
+
   def repos_path
     @config['repos_path'] ||= "/home/git/repositories"
   end
