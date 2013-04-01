@@ -24,11 +24,7 @@ namespace :deploy do
   task :symlink_config, :roles => :app do
     run "ln -nfs #{release_path}/config.yml.undev #{release_path}/config.yml"
   end
-
-  task :symlink_shell, :roles => :app do
-    run "rm -f /var/git/gitlab-shell && ln -s #{release_path} /var/git/gitlab-shell"
-  end
 end
 
-before 'deploy:finalize_update', 'deploy:symlink_config', 'deploy:symlink_shell'
+before 'deploy:finalize_update', 'deploy:symlink_config'
 after  'deploy:update', 'deploy:cleanup'
