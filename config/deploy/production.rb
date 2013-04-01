@@ -1,6 +1,6 @@
-set :host,            '10.40.42.123'
-set :env,             'staging'
-set :branch,          'staging'
+set :host,            '192.168.249.67'
+set :env,             'production'
+set :branch,          'master'
 set :user,            'gitlab'
 set :keep_releases,   5
 set :deploy_to,       '/rest/u/apps/gitlab-shell'
