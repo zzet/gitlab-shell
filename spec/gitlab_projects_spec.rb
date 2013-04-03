@@ -32,8 +32,8 @@ describe GitlabProjects do
 
     it "should receive valid cmd" do
       valid_cmd = "cd #{tmp_repo_path} && git init --bare"
-      valid_cmd << " && ln -s #{ROOT_PATH}/hooks/post-receive #{tmp_repo_path}/hooks/post-receive"
-      valid_cmd << " && ln -s #{ROOT_PATH}/hooks/update #{tmp_repo_path}/hooks/update"
+      valid_cmd << " && ln -s #{GitlabConfig.new.gitlab_shell_path}/hooks/post-receive #{tmp_repo_path}/hooks/post-receive"
+      valid_cmd << " && ln -s #{GitlabConfig.new.gitlab_shell_path}/hooks/update #{tmp_repo_path}/hooks/update"
       gl_projects.should_receive(:system).with(valid_cmd)
       gl_projects.exec
     end
@@ -127,7 +127,7 @@ describe GitlabProjects do
   end
 
   def tmp_repos_path
-    File.join(ROOT_PATH, 'tmp', 'repositories')
+    File.join(GitlabConfig.new.gitlab_shell_path, 'tmp', 'repositories')
   end
 
   def tmp_repo_path

@@ -14,3 +14,6 @@ repos_path: "/home/git/repositories"
 
 # File used as authorized_keys for gitlab user
 auth_file: "/home/git/.ssh/authorized_keys"
+
+# gitlab-shell path
+gitlab_shell_path: "/home/git/gitlab-shell"

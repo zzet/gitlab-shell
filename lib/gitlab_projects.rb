@@ -19,7 +19,8 @@ class GitlabProjects
   def initialize
     @command = ARGV.shift
     @project_name = ARGV.shift
-    @repos_path = GitlabConfig.new.repos_path
+    @config = GitlabConfig.new
+    @repos_path = @config.repos_path
     @full_path = File.join(@repos_path, @project_name)
   end
 
@@ -46,8 +47,8 @@ class GitlabProjects
   end
 
   def create_hooks_cmd
-    pr_hook_path = File.join(ROOT_PATH, 'hooks', 'post-receive')
-    up_hook_path = File.join(ROOT_PATH, 'hooks', 'update')
+    pr_hook_path = File.join(@config.gitlab_shell_path, 'hooks', 'post-receive')
+    up_hook_path = File.join(@config.gitlab_shell_path, 'hooks', 'update')
 
     "ln -s #{pr_hook_path} #{full_path}/hooks/post-receive && ln -s #{up_hook_path} #{full_path}/hooks/update"
   end
