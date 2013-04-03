@@ -10,3 +10,5 @@ repos_path: "/var/git/repositories"
 # File used as authorized_keys for gitlab user
 auth_file: "/var/git/.ssh/authorized_keys"
 
+# gitlab-shell path
+gitlab_shell_path: "/var/git/gitlab-shell"
