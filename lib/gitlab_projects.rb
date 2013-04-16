@@ -112,7 +112,7 @@ class GitlabProjects
     namespaced_path = File.join(repos_path, new_namespace)
     return false unless File.exists?(namespaced_path)
 
-    cmd = "cd #{namespaced_path} && git clone --bare #{@full_path}"
+    cmd = "cd #{namespaced_path} && git clone --bare #{full_path}"
     system(cmd)
   end
 end
