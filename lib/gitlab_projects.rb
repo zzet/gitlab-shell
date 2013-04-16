@@ -48,11 +48,7 @@ class GitlabProjects
   end
 
   def create_hooks_cmd
-    hook_path = File.join(@config.gitlab_shell_path, 'hooks')
-    #pr_hook_path = File.join(@config.gitlab_shell_path, 'hooks', 'post-receive')
-    #up_hook_path = File.join(@config.gitlab_shell_path, 'hooks', 'update')
-
-    "rm -rf #{full_path}/hooks && ln -s #{hook_path} #{full_path}/hooks"
+    create_hooks_to(full_path)
   end
 
   def rm_project
@@ -111,8 +107,17 @@ class GitlabProjects
 
     namespaced_path = File.join(repos_path, new_namespace)
     return false unless File.exists?(namespaced_path)
+    full_destination_path = File.join(namespaced_path, project_name)
 
-    cmd = "cd #{namespaced_path} && git clone --bare #{full_path}"
+    cmd = "cd #{namespaced_path} && git clone --bare #{full_path} && #{create_hooks_to(full_destination_path)}"
     system(cmd)
   end
+
+  private
+
+  def create_hooks_to(dest_path)
+    hook_path = File.join(@config.gitlab_shell_path, 'hooks')
+    "rm -rf #{full_path}/hooks && ln -s #{hook_path} #{full_path}/hooks"
+  end
+
 end
