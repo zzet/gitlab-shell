@@ -47,10 +47,11 @@ class GitlabProjects
   end
 
   def create_hooks_cmd
-    pr_hook_path = File.join(@config.gitlab_shell_path, 'hooks', 'post-receive')
-    up_hook_path = File.join(@config.gitlab_shell_path, 'hooks', 'update')
+    hook_path = File.join(@config.gitlab_shell_path, 'hooks')
+    #pr_hook_path = File.join(@config.gitlab_shell_path, 'hooks', 'post-receive')
+    #up_hook_path = File.join(@config.gitlab_shell_path, 'hooks', 'update')
 
-    "ln -s #{pr_hook_path} #{full_path}/hooks/post-receive && ln -s #{up_hook_path} #{full_path}/hooks/update"
+    "ln -s #{hook_path} #{full_path}/hooks"
   end
 
   def rm_project

@@ -16,13 +16,13 @@ Tempfile.open('git-hook-input') do |tempfile|
   $stdin.each_line { |line| tempfile.print(line) }
   tempfile.close
 
-  #Dir.chdir(current_dir) do
-    #system("echo #{args * ' '} | #{current_dir}/hooks/post-receive-action-origin")
-  #end
+  Dir.chdir(current_dir) do
+    system("echo #{args * ' '} | #{current_dir}/hooks/post-receive-action-origin")
+  end
 
-  #Dir.chdir(current_dir) do
-    #system("cat #{tempfile.path} | #{current_dir}/hooks/post-receive-action-undev #{args * ' '}")
-  #end
+  Dir.chdir(current_dir) do
+    system("cat #{tempfile.path} | #{current_dir}/hooks/post-receive-action-undev #{args * ' '}")
+  end
 
   # preseed/preseed
   if current_dir == "/var/git/repositories/preseed/preseed.git"

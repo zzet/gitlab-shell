@@ -68,22 +68,22 @@ while read old_version new_version ref_name; do
         # делать freeeze.
         trap - ERR
         res=""
-        #res=$($KNIFE cookbook upload -o ./cookbooks $cookbook 2>&1 | tee /dev/stderr | grep 'ERROR')
-        #if [ "$res" != "" ]; then
-          #exit 1
-        #fi
+        res=$($KNIFE cookbook upload -o ./cookbooks $cookbook 2>&1 | tee /dev/stderr | grep 'ERROR')
+        if [ "$res" != "" ]; then
+          exit 1
+        fi
 
-        #res=""
-        #res=$($KNIFE cookbook upload -o ./cookbooks $cookbook --freeze 2>&1 | tee /dev/stderr | grep 'ERROR')
-        #if [ "$res" != "" ]; then
-          #exit 1
-        #fi
+        res=""
+        res=$($KNIFE cookbook upload -o ./cookbooks $cookbook --freeze 2>&1 | tee /dev/stderr | grep 'ERROR')
+        if [ "$res" != "" ]; then
+          exit 1
+        fi
 
         ruby $HOOK_DIR/wiki-doc.rb -c $cookbook
 
       else
         echo "=> Delete cookbook: $cookbook"
-        #$KNIFE cookbook delete -y $cookbook -a
+        $KNIFE cookbook delete -y $cookbook -a
         ruby $HOOK_DIR/wiki-doc.rb $cookbook --delete
       fi
     done
@@ -91,20 +91,20 @@ while read old_version new_version ref_name; do
     for role in $(printf "%s\n" ${changed_roles[@]} | sort | uniq ); do
       if [ -f roles/$role ]; then
         echo "=> Upload role: $(basename $role .rb)"
-        #$KNIFE role from file ./roles/$role
+        $KNIFE role from file ./roles/$role
       else
         echo "=> Delete role: $(basename $role .rb)"
-        #$KNIFE role delete -y $(basename $role .rb)
+        $KNIFE role delete -y $(basename $role .rb)
       fi
     done
 
     for env in $(printf "%s\n" ${changed_envs[@]} | sort | uniq ); do
       if [ -f environments/$env ]; then
         echo "=> Upload env: $(basename $env .rb)"
-        #$KNIFE environment from file ./environments/$env
+        $KNIFE environment from file ./environments/$env
       else
         echo "=> Delete env: $(basename $env .rb)"
-        #$KNIFE environment delete -y $(basename $env .rb)
+        $KNIFE environment delete -y $(basename $env .rb)
       fi
     done
 

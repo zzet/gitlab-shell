@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GIT_REPO_URI="git@gitlab.platform.home:flash-player/coreplayer.git"
+GIT_REPO_URI="git@git.undev.cc:flash-player/coreplayer.git"
 
 function exit_fail() {
   echo "[FAIL] (On step: $1)"

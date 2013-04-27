@@ -25,7 +25,7 @@ current_dir = File.expand_path(Dir.pwd)
 args = $stdin.read.split(/\s/)
 
 Dir.chdir(current_dir) do
-  #system("echo #{args * ' '} | #{current_dir}/hooks/pre-receive-action-origin")
+  system("echo #{args * ' '} | #{current_dir}/hooks/pre-receive-action-origin")
 
   # megaadmins/chef
   if current_dir == "/var/git/repositories/megaadmins/chef.git"

@@ -10,9 +10,9 @@ require 'net/http'
 require 'getoptlong'
 require 'chef/cookbook/metadata'
 
-WIKI_LOGIN = 'Sysop'
-WIKI_PASSWORD = '123456'
-WIKI_API_URI = 'http://wiki-staging-01.undev.cc/api.php'
+WIKI_LOGIN = 'megaadmins-bot'
+WIKI_PASSWORD = 'EdIsGod'
+WIKI_API_URI = 'http://wiki.undev.cc/api.php'
 
 class WikiAPI
 
