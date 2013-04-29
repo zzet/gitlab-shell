@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require 'dns/zonefile'
+
+def get_serial(zone)
+  zone = DNS::Zonefile.parse(zone)
+  return zone.soa.serial
+end
+
+while data = gets
+  oldrev, newrev, ref = data.chomp.split(" ")
+
+  old_zone = `git show #{oldrev}:db`
+  new_zone = `git show #{newrev}:db`
+
+  old_serial = get_serial(old_zone)
+  new_serial = get_serial(new_zone)
+
+  if old_serial >= new_serial
+    puts " => ERROR: Wrong serial!"
+    exit 1
+  end
+end

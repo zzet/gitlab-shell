@@ -1,5 +1,7 @@
 source "http://rubygems.org"
 
+gem 'dns-zonefile'
+
 group :development do
   gem 'coveralls', require: false
   gem 'rspec'
