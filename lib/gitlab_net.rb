@@ -10,6 +10,11 @@ class GitlabNet
     project_name = project_name.gsub(/\.git\Z/, "")
     project_name = project_name.gsub(/\A\//, "")
 
+    # tmp костыль
+    project_arr = project_name.split("/")
+    project_arr.shift if project_arr.size == 3
+    project_name = project_arr.join("/")
+
     key_id = key.gsub("key-", "")
 
     url = "#{host}/allowed?key_id=#{key_id}&action=#{cmd}&ref=#{ref}&project=#{project_name}"
