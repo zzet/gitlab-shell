@@ -4,7 +4,7 @@ require 'dns/zonefile'
 
 def get_serial(zone)
   zone = DNS::Zonefile.parse(zone)
-  return zone.soa.serial
+  return zone.soa.serial.to_s
 end
 
 while data = gets
@@ -17,7 +17,7 @@ while data = gets
   new_serial = get_serial(new_zone)
 
   if old_serial >= new_serial
-    puts " => ERROR: Wrong serial!"
+    puts "\e[1m\e[31m => ERROR: Wrong serial!\e[0m"
     exit 1
   end
 end
