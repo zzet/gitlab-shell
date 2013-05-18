@@ -20,8 +20,15 @@ class GitlabShell
 
         if validate_access
           process_cmd
+        else
+          message = "gitlab-shell: Access denied for git command <#{@origin_cmd}>"
+          message << " by user with key #{@key_id}."
+          $logger.warn message
         end
       else
+        message = "gitlab-shell: Attempt to execute disallowed command "
+        message << "<#{@origin_cmd}> by user with key #{@key_id}."
+        $logger.warn message
         puts 'Not allowed command'
       end
     else
@@ -43,7 +50,9 @@ class GitlabShell
   end
 
   def process_cmd
-    exec_cmd "#{@git_cmd} #{repo_full_path}"
+    cmd = "#{@git_cmd} #{repo_full_path}"
+    $logger.info "gitlab-shell: executing git command <#{cmd}> for user with key #{@key_id}."
+    exec_cmd(cmd)
     update_permission_for_group
   end
 
