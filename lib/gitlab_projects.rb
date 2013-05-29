@@ -42,7 +42,7 @@ class GitlabProjects
 
   def add_project
     FileUtils.mkdir_p(full_path, mode: 0770)
-    cmd = "cd #{full_path} && git init --bare && #{create_hooks_cmd}"
+    cmd = "cd #{full_path} && git init --bare && #{create_hooks_cmd} && chmod -R g+w"
     system(cmd)
   end
 
