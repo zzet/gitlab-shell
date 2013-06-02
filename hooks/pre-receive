@@ -36,5 +36,13 @@ Dir.chdir(current_dir) do
       $stdout.flush
       exit!(1)
     end
+  elsif current_dir == "/var/git/repositories/dns-zones/nptv-home.git"
+    system("echo #{args * ' '} | #{current_dir}/hooks/pre-receive-dns-zones")
+    exit_status = $?
+    if not exit_status.success?
+      puts "=> Failed upload"
+      $stdout.flush
+      exit!(1)
+    end
   end
 end
