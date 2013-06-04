@@ -43,8 +43,8 @@ class GitlabShell
   end
 
   def process_cmd
-    repo_full_path = File.join(repos_path, repo_name)
     exec_cmd "#{@git_cmd} #{repo_full_path}"
+    update_permission_for_group
   end
 
   def validate_access
@@ -57,5 +57,13 @@ class GitlabShell
 
   def api
     GitlabNet.new
+  end
+
+  def repo_full_path
+    File.join(repos_path, repo_name)
+  end
+
+  def update_permission_for_group
+    Kernel::exec "chmod -R g+w #{repo_full_path}"
   end
 end
