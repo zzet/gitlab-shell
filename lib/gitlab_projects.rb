@@ -34,6 +34,7 @@ class GitlabProjects
     when 'mv-project';  mv_project
     when 'import-project'; import_project
     when 'fork-project'; fork_project
+    when 'update-head';  update_head
     else
       $logger.warn "Attempt to execute invalid gitlab-projects command #{@command.inspect}."
       puts 'not allowed'
@@ -144,11 +145,31 @@ class GitlabProjects
     system(cmd)
   end
 
+  def update_head
+    new_head = ARGV.shift
+
+    unless new_head
+      $logger.error "update-head failed: no branch provided."
+      return false
+    end
+
+    unless File.exists?(File.join(full_path, 'refs/heads', new_head))
+      $logger.error "update-head failed: specified branch does not exist in ref/heads."
+      return false
+    end
+
+    File.open(File.join(full_path, 'HEAD'), 'w') do |f|
+      f.write("ref: refs/heads/#{new_head}")
+    end
+
+    $logger.info "Update head in project #{project_name} to <#{new_head}>."
+    true
+  end
+
   private
 
   def create_hooks_to(dest_path)
     hook_path = File.join(@config.gitlab_shell_path, 'hooks')
     "rm -rf #{full_path}/hooks && ln -s #{hook_path} #{full_path}/hooks"
   end
-
 end
