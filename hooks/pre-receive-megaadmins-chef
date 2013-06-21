@@ -23,8 +23,8 @@ function _error() {
 trap _error ERR
 
 while read old_version new_version ref_name; do
-
-  changes=$(git diff-tree --numstat $old_version $new_version | awk '{ print $3; }')
+  # sort используется для того чтобы сначала удалить, потом зааплоадить
+  changes=$(git diff-tree --numstat $old_version $new_version | sort -n | awk '{ print $3; }')
 
   declare -a changed_cookbooks
   declare -a changed_roles
@@ -77,7 +77,7 @@ while read old_version new_version ref_name; do
       fi
     done
 
-    for role in $(printf "%s\n" ${changed_roles[@]} | sort | uniq ); do
+    for role in $(printf "%s\n" ${changed_roles[@]} | uniq ); do
       if [ -f $role ]; then
         echo "=> Upload role: $(basename $role .rb)"
         $KNIFE role from file $role
@@ -87,7 +87,7 @@ while read old_version new_version ref_name; do
       fi
     done
 
-    for env in $(printf "%s\n" ${changed_envs[@]} | sort | uniq ); do
+    for env in $(printf "%s\n" ${changed_envs[@]} | uniq ); do
       if [ -f $env ]; then
         echo "=> Upload env: $(basename $env .rb)"
         $KNIFE environment from file $env
