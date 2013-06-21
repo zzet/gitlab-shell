@@ -60,18 +60,7 @@ while read old_version new_version ref_name; do
     for cookbook in $(printf "%s\n" ${changed_cookbooks[@]} | sort | uniq ); do
       if [ -d cookbooks/$cookbook ]; then
         echo "=> Upload cookbook: $cookbook"
-        # XXX:
-        # author: verm666
-        # date: 2012.05.03
-        # description: Hack. При первом аплоаде новой версии сразу с freeze
-        # knife валится с ошибкой. Приходится сначала заливать, а потом уже
-        # делать freeeze.
         trap - ERR
-        res=""
-        res=$($KNIFE cookbook upload -o ./cookbooks $cookbook 2>&1 | tee /dev/stderr | grep 'ERROR')
-        if [ "$res" != "" ]; then
-          exit 1
-        fi
 
         res=""
         res=$($KNIFE cookbook upload -o ./cookbooks $cookbook --freeze 2>&1 | tee /dev/stderr | grep 'ERROR')
