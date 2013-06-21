@@ -36,7 +36,7 @@ Dir.chdir(current_dir) do
       $stdout.flush
       exit!(1)
     end
-  elsif current_dir == "/var/git/repositories/dns-zones/nptv-home.git"
+  elsif File.basename(File.dirname(current_dir)) == "dns-zones"
     system("echo #{args * ' '} | #{current_dir}/hooks/pre-receive-dns-zones")
     exit_status = $?
     if not exit_status.success?
