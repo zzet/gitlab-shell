@@ -41,7 +41,7 @@ while read old_version new_version ref_name; do
         changed_roles+=( $file )
       ;;
       environments/*)
-        changed_envs+=( $name )
+        changed_envs+=( $file )
       ;;
     esac
   done
@@ -99,9 +99,9 @@ while read old_version new_version ref_name; do
     done
 
     for env in $(printf "%s\n" ${changed_envs[@]} | sort | uniq ); do
-      if [ -f environments/$env ]; then
+      if [ -f $env ]; then
         echo "=> Upload env: $(basename $env .rb)"
-        $KNIFE environment from file ./environments/$env
+        $KNIFE environment from file $env
       else
         echo "=> Delete env: $(basename $env .rb)"
         $KNIFE environment delete -y $(basename $env .rb)
