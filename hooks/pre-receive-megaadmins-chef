@@ -38,7 +38,7 @@ while read old_version new_version ref_name; do
         changed_cookbooks+=( $name )
       ;;
       roles/*)
-        changed_roles+=( $name )
+        changed_roles+=( $file )
       ;;
       environments/*)
         changed_envs+=( $name )
@@ -89,9 +89,9 @@ while read old_version new_version ref_name; do
     done
 
     for role in $(printf "%s\n" ${changed_roles[@]} | sort | uniq ); do
-      if [ -f roles/$role ]; then
+      if [ -f $role ]; then
         echo "=> Upload role: $(basename $role .rb)"
-        $KNIFE role from file ./roles/$role
+        $KNIFE role from file $role
       else
         echo "=> Delete role: $(basename $role .rb)"
         $KNIFE role delete -y $(basename $role .rb)
