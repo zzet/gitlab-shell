@@ -79,7 +79,7 @@ while read old_version new_version ref_name; do
         new_cookbook_version=$(get_cookbook_version $new_version $cookbook)
         old_cookbook_version=$(get_cookbook_version $old_version $cookbook)
 
-        if [[ "$old_cookbook_version" > "$new_cookbook_version" ]];
+        if [[ "$old_cookbook_version" >= "$new_cookbook_version" ]];
           echo "=> You need to bump the version: $cookbook"
           exit 1
         fi
