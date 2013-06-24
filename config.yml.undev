@@ -32,7 +32,7 @@ redis:
 
 # Log file.
 # Default is gitlab-shell.log in the root directory.
-log_file: "/storage/log/gitlab-sidekiq-gitshell/current"
+log_file: STDOUT #"/storage/log/gitlab-sidekiq-gitshell/current"
 
 # Log level. INFO by default
 log_level: INFO
