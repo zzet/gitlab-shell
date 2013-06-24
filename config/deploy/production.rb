@@ -1,4 +1,4 @@
-set :host,            '192.168.249.67'
+set :host,            '10.40.252.13'
 set :env,             'production'
 set :branch,          'master'
 set :user,            'gitlab'
