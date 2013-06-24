@@ -24,7 +24,14 @@ namespace :deploy do
   task :symlink_config, :roles => :app do
     run "ln -nfs #{release_path}/config.yml.undev #{release_path}/config.yml"
   end
+
+  desc 'Create log file'
+  task :add_log_file, roles: :app do
+    run "touch #{release_path}/gitlab-shell.log"
+    run "chown git:gitlab #{release_path}/gitlab-shell.log"
+    run "chmod 660 #{release_path}/gitlab-shell.log"
+  end
 end
 
-before 'deploy:finalize_update', 'deploy:symlink_config'
+before 'deploy:finalize_update', 'deploy:symlink_config', 'deploy:add_log_file'
 after  'deploy:update', 'deploy:cleanup'
