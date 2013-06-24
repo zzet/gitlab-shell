@@ -5,6 +5,12 @@ HOOK_DIR=/var/git/gitlab-shell/hooks
 CHEF_SERVER=mgmt01.undev.cc
 KNIFE="knife"
 
+function _exit() {
+  local code=$1
+  rm -rf $work_dir
+  exit $code
+}
+
 function _error() {
   local err=$?
   current_dir=$(pwd -P)
@@ -17,9 +23,7 @@ function _error() {
   echo "ERROR" " * Line        : $BASH_LINENO"
   echo "ERROR" "************************************"
 
-  rm -rf $work_dir
-
-  exit 1
+  _exit 1
 }
 
 function get_cookbook_version() {
@@ -88,18 +92,18 @@ while read old_version new_version ref_name; do
 
         if [[ "$old_cookbook_version" > "$new_cookbook_version" ]]; then
           echo -e "=> \e[1m\e[31mATTENTION! You need to bump the cookbook version: $cookbook\e[0m"
-          exit 1
+          _exit 1
         fi
 
         if [ "$old_cookbook_version" = "$new_cookbook_version" ]; then
           echo -e "=> \e[1m\e[31mATTENTION! You need to bump the cookbook version: $cookbook\e[0m"
-          exit 1
+          _exit 1
         fi
 
         res=""
         res=$($KNIFE cookbook upload -o ./cookbooks $cookbook --freeze 2>&1 | tee /dev/stderr | grep 'ERROR')
         if [ "$res" != "" ]; then
-          exit 1
+          _exit 1
         fi
       else
         echo "=> Delete cookbook: $cookbook"
