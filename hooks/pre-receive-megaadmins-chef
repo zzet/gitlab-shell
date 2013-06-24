@@ -17,6 +17,8 @@ function _error() {
   echo "ERROR" " * Line        : $BASH_LINENO"
   echo "ERROR" "************************************"
 
+  rm -rf $work_dir
+
   exit 1
 }
 
