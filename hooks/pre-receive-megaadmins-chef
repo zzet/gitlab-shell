@@ -20,6 +20,20 @@ function _error() {
   exit 1
 }
 
+function get_cookbook_version() {
+  local commit=$1
+  local cookbook_name=$2
+
+  content=$(git show $commit:$cookbook_name/metadata.rb)
+  if [ $? -ne 0 ]; then
+    echo ""
+  else
+    version=$(echo -e "$content" | grep 'version' | awk '{ print $2; }' \
+     | sed s'/"//' | sed "/'//")
+    echo $version
+  fi
+}
+
 trap _error ERR
 
 while read old_version new_version ref_name; do
@@ -55,21 +69,26 @@ while read old_version new_version ref_name; do
 
     git --git-dir=$work_dir/git_repo/.git checkout $new_version &>/dev/null
 
-    echo "=> Upload chages to $CHEF_SERVER... "
+    echo "=> Upload changes to $CHEF_SERVER... "
 
     for cookbook in $(printf "%s\n" ${changed_cookbooks[@]} | sort | uniq ); do
       if [ -d cookbooks/$cookbook ]; then
         echo "=> Upload cookbook: $cookbook"
         trap - ERR
 
+        new_cookbook_version=$(get_cookbook_version $new_version $cookbook)
+        old_cookbook_version=$(get_cookbook_version $old_version $cookbook)
+
+        if [[ "$old_cookbook_version" > "$new_cookbook_version" ]];
+          echo "=> You need to bump the version: $cookbook"
+          exit 1
+        fi
+
         res=""
         res=$($KNIFE cookbook upload -o ./cookbooks $cookbook --freeze 2>&1 | tee /dev/stderr | grep 'ERROR')
         if [ "$res" != "" ]; then
           exit 1
         fi
-
-        ruby $HOOK_DIR/wiki-doc.rb -c $cookbook
-
       else
         echo "=> Delete cookbook: $cookbook"
         $KNIFE cookbook delete -y $cookbook -a
