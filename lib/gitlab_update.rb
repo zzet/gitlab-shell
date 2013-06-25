@@ -2,10 +2,14 @@ require_relative 'gitlab_init'
 require_relative 'gitlab_net'
 
 class GitlabUpdate
+  attr_reader :config
+
   def initialize(repo_path, key_id, refname)
+    @config = GitlabConfig.new
+
     @repo_path = repo_path.strip
     @repo_name = repo_path
-    @repo_name.gsub!(GitlabConfig.new.repos_path.to_s, "")
+    @repo_name.gsub!(config.repos_path.to_s, "")
     @repo_name.gsub!(/\.git$/, "")
     @repo_name.gsub!(/^\//, "")
 
@@ -49,7 +53,7 @@ class GitlabUpdate
   end
 
   def update_redis
-    command = "env -i redis-cli rpush 'resque:gitlab:queue:post_receive' '{\"class\":\"PostReceive\",\"args\":[\"#{@repo_path}\",\"#{@oldrev}\",\"#{@newrev}\",\"#{@refname}\",\"#{@key_id}\"]}' > /dev/null 2>&1"
+    command = "#{config.redis_command} rpush '#{config.redis_namespace}:queue:post_receive' '{\"class\":\"PostReceive\",\"args\":[\"#{@repo_path}\",\"#{@oldrev}\",\"#{@newrev}\",\"#{@refname}\",\"#{@key_id}\"]}' > /dev/null 2>&1"
     system(command)
   end
 end

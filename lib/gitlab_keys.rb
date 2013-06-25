@@ -1,6 +1,7 @@
 require 'open3'
 
 require_relative 'gitlab_config'
+require_relative 'gitlab_logger'
 
 class GitlabKeys
   attr_accessor :auth_file, :key
@@ -19,6 +20,7 @@ class GitlabKeys
     when 'add-key'; add_key
     when 'rm-key';  rm_key
     else
+      $logger.warn "Attempt to execute invalid gitlab-keys command #{@command.inspect}."
       puts 'not allowed'
       false
     end
@@ -27,13 +29,15 @@ class GitlabKeys
   protected
 
   def add_key
+    $logger.info "Adding key #{@key_id} => #{@key.inspect}"
     cmd = "command=\"#{@config.gitlab_shell_path}/bin/gitlab-shell #{@key_id}\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty #{@key}"
     cmd = "echo \'#{cmd}\' >> #{auth_file}"
     system(cmd)
   end
 
   def rm_key
-    cmd = "sed -i '/shell #{@key_id}/d' #{auth_file}"
+    $logger.info "Removing key #{@key_id}"
+    cmd = "sed -i '/shell #{@key_id}\"/d' #{auth_file}"
     system(cmd)
   end
 end
