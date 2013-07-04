@@ -28,7 +28,7 @@ namespace :deploy do
   desc 'Create log file'
   task :add_log_file, roles: :app do
     run "touch #{release_path}/gitlab-shell.log"
-    run "chown git:gitlab #{release_path}/gitlab-shell.log"
+    run "chown gitlab:git #{release_path}/gitlab-shell.log"
     run "chmod 660 #{release_path}/gitlab-shell.log"
   end
 end
