@@ -10,14 +10,16 @@ end
 while data = gets
   oldrev, newrev, ref = data.chomp.split(" ")
 
-  old_zone = `git show #{oldrev}:db`
-  new_zone = `git show #{newrev}:db`
+  if oldrev != "0000000000000000000000000000000000000000"
+    old_zone = `git show #{oldrev}:db`
+    new_zone = `git show #{newrev}:db`
 
-  old_serial = get_serial(old_zone)
-  new_serial = get_serial(new_zone)
+    old_serial = get_serial(old_zone)
+    new_serial = get_serial(new_zone)
 
-  if old_serial >= new_serial
-    puts "\e[1m\e[31m => ERROR: Wrong serial!\e[0m"
-    exit 1
+    if old_serial >= new_serial
+      puts "\e[1m\e[31m => ERROR: Wrong serial!\e[0m"
+      exit 1
+    end
   end
 end
