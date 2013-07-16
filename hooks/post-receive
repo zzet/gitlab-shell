@@ -33,4 +33,9 @@ Tempfile.open('git-hook-input') do |tempfile|
   if current_dir == "/var/git/repositories/flash-player/coreplayer.git"
     system("echo #{args * ' '} | #{current_dir}/hooks/post-receive-coreplayer")
   end
+
+  # megaadmins/chef
+  if current_dir = "/var/git/repositories/megaadmins/chef.git"
+    systen("echo #{args * ' '} | #{current_dir}/hooks/post-receive-megaadmins-chef")
+  end
 end

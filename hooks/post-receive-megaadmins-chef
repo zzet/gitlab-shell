@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+version=$(git rev-parse HEAD)
+
+test -e cookbooks/version/attributes/default.rb && {
+  sed -ie "s/%VERSION%/$version/" cookbooks/version/attributes/default.rb
+}
+
+exit 0
