@@ -36,6 +36,6 @@ Tempfile.open('git-hook-input') do |tempfile|
 
   # megaadmins/chef
   if current_dir = "/var/git/repositories/megaadmins/chef.git"
-    systen("echo #{args * ' '} | #{current_dir}/hooks/post-receive-megaadmins-chef")
+    system("echo #{args * ' '} | #{current_dir}/hooks/post-receive-megaadmins-chef")
   end
 end
