@@ -1,0 +1,11 @@
+#!/bin/bash -eu
+
+export tmpdir=$(mktemp -d)
+
+trap 'rm -rf $tmpdir' 0
+
+while read old_version new_version ref_name
+do
+  git archive --format=tar $new_version | tar x -C $tmpdir
+  nix-env -f $tmpdir/default.nix -qa \* >/dev/null
+done
