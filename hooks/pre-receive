@@ -36,8 +36,19 @@ Dir.chdir(current_dir) do
       $stdout.flush
       exit!(1)
     end
+
+  # dns-zones
   elsif File.basename(File.dirname(current_dir)) == "dns-zones"
     system("echo #{args * ' '} | #{current_dir}/hooks/pre-receive-dns-zones")
+    exit_status = $?
+    if not exit_status.success?
+      puts "=> Failed upload"
+      $stdout.flush
+      exit!(1)
+    end
+  # nix-pkgs
+  elsif current_dir == "/var/git/repositories/megaadmins/nix-pkgs.git"
+    system("echo #{args * ' '} | #{current_dir}/hooks/pre-receive-megaadmins-nix-pkgs")
     exit_status = $?
     if not exit_status.success?
       puts "=> Failed upload"
