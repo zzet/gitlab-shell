@@ -82,6 +82,10 @@ while read old_version new_version ref_name; do
 
     echo "=> Upload changes to $CHEF_SERVER... "
 
+    echo "=> Upload git version..."
+    ruby cookbooks/version/generate.rb $new_version
+    $KNIFE cookbook upload -o ./cookbooks version --force > /dev/null
+
     for cookbook in $(printf "%s\n" ${changed_cookbooks[@]} | sort | uniq ); do
       if [ -d cookbooks/$cookbook ]; then
         echo "=> Upload cookbook: $cookbook"
