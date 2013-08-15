@@ -2,7 +2,7 @@
 user: git
 
 # Url to gitlab instance. Used for api calls
-gitlab_url: "http://git.undev.cc/"
+gitlab_url: "https://git.undev.cc/"
 
 http_settings:
 #  user: someone
