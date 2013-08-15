@@ -7,10 +7,9 @@ gitlab_url: "http://git.undev.cc/"
 http_settings:
 #  user: someone
 #  password: somepass
-#  ca_file: /etc/ssl/cert.pem
-#  ca_path: /etc/pki/tls/certs
-  self_signed_cert: false
-
+  ca_file: /etc/nginx/ssl/git.undev.cc.pem
+  ca_path: /var/git/gitlab-shell/
+  self_signed_cert: true
 
 # Repositories path
 # REPOS_PATH MUST NOT BE A SYMLINK!!!
