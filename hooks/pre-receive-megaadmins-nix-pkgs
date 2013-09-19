@@ -6,7 +6,6 @@ trap 'rm -rf $tmpdir' 0
 
 while read old_version new_version ref_name
 do
-  echo -n ""
-  # git archive --format=tar $new_version | tar x -C $tmpdir
-  # sudo nix-env -f $tmpdir/default.nix -qa \* >/dev/null
+	git archive --format=tar $new_version | tar x -C $tmpdir
+	sh -c "cd $tmpdir && sudo /usr/bin/nix-env -f default.nix -qa \* >/dev/null"
 done
