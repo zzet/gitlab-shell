@@ -1,3 +1,7 @@
+# Load DSL and Setup Up Stages
+require 'capistrano/version'
+load 'deploy'
+
 require 'bundler/capistrano'
 require "rvm/capistrano"
 require 'capistrano/ext/multistage'
