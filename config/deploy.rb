@@ -9,7 +9,7 @@ set :env,            'production'
 set :deploy_to,      "/rest/u/apps/#{application}"
 set :bundle_without, %w[development test]
 
-set :rvm_type,       :system
+set :undev_ruby_version, '2.0.0-p247'
 
 set :scm, :git
 set :repository,     'git://git.undev.cc/infrastructure/gitlab-shell.git'

@@ -1,5 +1,6 @@
 GEM
   remote: http://rubygems.org/
+  remote: http://gems.undev.cc/
   specs:
     addressable (2.3.2)
     capi (0.1.1)

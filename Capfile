@@ -3,7 +3,7 @@ require 'capistrano/version'
 load 'deploy'
 
 require 'bundler/capistrano'
-require "rvm/capistrano"
+require 'undev/capistrano'
 require 'capistrano/ext/multistage'
 # Maintance sidekiq with cap
 #require 'sidekiq/capistrano'
