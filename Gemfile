@@ -14,7 +14,7 @@ group :development do
   # Deploy with Capistrano
   gem "capi"
   gem 'capistrano'
-  gem 'rvm-capistrano'
+  gem 'undev', '>=0.2.1'
   gem 'capistrano-ext'
   gem 'capistrano-maintenance'
 end
