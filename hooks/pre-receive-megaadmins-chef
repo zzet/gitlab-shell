@@ -112,7 +112,6 @@ while read old_version new_version ref_name; do
       else
         echo "=> Delete cookbook: $cookbook"
         $KNIFE cookbook delete -y $cookbook -a
-        ruby $HOOK_DIR/wiki-doc.rb $cookbook --delete
       fi
     done
 
