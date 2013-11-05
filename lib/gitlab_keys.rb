@@ -32,8 +32,10 @@ class GitlabKeys
   def add_key
     $logger.info "Adding key #{@key_id} => #{@key.inspect}"
     cmd = "command=\"#{@config.gitlab_shell_path}/bin/gitlab-shell #{@key_id}\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty #{@key}"
-    cmd = "echo \'#{cmd}\' >> #{auth_file}"
-    system(cmd)
+    # http://blog.gitlab.org/gitlab-ce-6-2-and-5-4-security-release/
+    #cmd = "echo \'#{cmd}\' >> #{auth_file}"
+    #system(cmd)
+    open(auth_file, 'a') { |file| file.puts(cmd) }
   end
 
   def rm_key
