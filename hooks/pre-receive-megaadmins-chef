@@ -3,7 +3,7 @@
 GIT_REPO_URI=/var/git/repositories/megaadmins/chef.git
 HOOK_DIR=/var/git/gitlab-shell/hooks
 CHEF_SERVER=mgmt01.undev.cc
-KNIFE="knife"
+KNIFE="/opt/chef-client/bin/knife"
 
 function _exit() {
   local code=$1
