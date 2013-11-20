@@ -3,7 +3,7 @@
 GIT_REPO_URI=/var/git/repositories/megaadmins/chef.git
 HOOK_DIR=/var/git/gitlab-shell/hooks
 CHEF_SERVER=mgmt01.undev.cc
-KNIFE="/opt/chef-client/bin/knife"
+KNIFE="/opt/chef-client/bin/knife-undev"
 
 function _exit() {
   local code=$1
@@ -117,10 +117,10 @@ while read old_version new_version ref_name; do
 
     for role in $(printf "%s\n" ${changed_roles[@]} | uniq ); do
       if [ -f $role ]; then
-        echo "=> Upload role: $(basename $role .rb)"
+        echo "=> Upload role: $(basename $role )"
         $KNIFE role from file $role
       else
-        echo "=> Delete role: $(basename $role .rb)"
+        echo "=> Delete role: $(basename $role )"
         $KNIFE role delete -y $(basename $role .rb)
       fi
     done
