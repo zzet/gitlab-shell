@@ -31,19 +31,27 @@ class GitlabKeys
 
   def add_key
     $logger.info "Adding key #{@key_id} => #{@key.inspect}"
-    cmd = "command=\"#{@config.gitlab_shell_path}/bin/gitlab-shell #{@key_id}\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty #{@key}"
-    open(auth_file, 'a') { |file| file.puts(cmd) }
+    auth_line = "command=\"#{@config.gitlab_shell_path}/bin/gitlab-shell #{@key_id}\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty #{@key}"
+    open(auth_file, 'a') { |file| file.puts(auth_line) }
+    true
   end
 
   def rm_key
     $logger.info "Removing key #{@key_id}"
     Tempfile.open('authorized_keys') do |temp|
-      cmd = "sed '/shell #{@key_id}\"/d' #{auth_file} > #{temp.path} && mv #{temp.path} #{auth_file}"
-      system(cmd)
+      open(auth_file, 'r+') do |current|
+        current.each do |line|
+          temp.puts(line) unless line.include?("/bin/gitlab-shell #{@key_id}\"")
+        end
+      end
+      temp.close
+      FileUtils.cp(temp.path, auth_file)
     end
+    true
   end
 
   def clear
-    system("echo '# Managed by gitlab-shell' > #{auth_file}")
+    open(auth_file, 'w') { |file| file.puts '# Managed by gitlab-shell' }
+    true
   end
 end

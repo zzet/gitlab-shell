@@ -1,4 +1,3 @@
-require 'open3'
 require 'fileutils'
 
 require_relative 'gitlab_config'
@@ -51,7 +50,7 @@ class GitlabProjects
   def create_branch
     branch_name = ARGV.shift
     ref = ARGV.shift || "HEAD"
-    cmd = %W(git --git-dir=#{full_path} branch #{branch_name} #{ref})
+    cmd = %W(git --git-dir=#{full_path} branch -- #{branch_name} #{ref})
     system(*cmd)
   end
 
@@ -64,7 +63,7 @@ class GitlabProjects
   def create_tag
     tag_name = ARGV.shift
     ref = ARGV.shift || "HEAD"
-    cmd = %W(git --git-dir=#{full_path} tag #{tag_name} #{ref})
+    cmd = %W(git --git-dir=#{full_path} tag -- #{tag_name} #{ref})
     system(*cmd)
   end
 
@@ -98,8 +97,8 @@ class GitlabProjects
   def import_project
     @source = ARGV.shift
     $logger.info "Importing project #{@project_name} from <#{@source}> to <#{full_path}>."
-    cmd = %W(git clone --bare #{@source} #{project_name})
-    system(*cmd, chdir: repos_path) && create_hooks(full_path)
+    cmd = %W(git clone --bare -- #{@source} #{full_path})
+    system(*cmd) && create_hooks(full_path)
   end
 
   # Move repository from one directory to another
@@ -174,8 +173,8 @@ class GitlabProjects
     end
 
     $logger.info "Forking project from <#{full_path}> to <#{full_destination_path}>."
-    cmd = %W(git clone --bare #{full_path})
-    system(*cmd, chdir: namespaced_path) && create_hooks(full_destination_path)
+    cmd = %W(git clone --bare -- #{full_path} #{full_destination_path})
+    system(*cmd) && create_hooks(full_destination_path)
   end
 
   def update_head
@@ -183,11 +182,6 @@ class GitlabProjects
 
     unless new_head
       $logger.error "update-head failed: no branch provided."
-      return false
-    end
-
-    unless File.exists?(File.join(full_path, 'refs/heads', new_head))
-      $logger.error "update-head failed: specified branch does not exist in ref/heads."
       return false
     end
 
