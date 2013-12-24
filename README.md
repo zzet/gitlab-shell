@@ -46,3 +46,7 @@ Remove key
 
     ./bin/gitlab-keys rm-key key-23 "ssh-rsa AAAAx321..."
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/zzet/gitlab-shell/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
