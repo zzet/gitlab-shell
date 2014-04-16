@@ -1,3 +1,27 @@
+v1.9.1
+  - Update hook sends branch and tag name 
+
+v1.9.0
+  - Call api in update hook for both ssdh and http push. Requires GitLab 6.7+
+  - Pass oldrev and newrev to api.allowed?
+
+v1.8.5
+  - Add `gitlab-keys batch-add-keys` subcommand for authorized_keys rebuilds
+
+v1.8.4
+  - Dont do import if repository exists
+
+v1.8.3
+  - Add timeout option for repository import
+
+v1.8.2
+  - Fix broken 1.8.1
+
+v1.8.1
+  - Restrict Environment Variables
+  - Add bin/create-hooks command
+  - More safe shell execution
+
 v1.8.0
   - Fix return values in GitlabKeys
 
