@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'timeout'
 
 require_relative 'gitlab_config'
 require_relative 'gitlab_logger'
@@ -15,6 +16,12 @@ class GitlabProjects
   # Full path is an absolute path to the repository
   # Ex /home/git/repositories/test.git
   attr_reader :full_path
+
+  def self.create_hooks(path)
+    hooks = File.join(path, 'hooks')
+    FileUtils.rm_rf(hooks) if File.exists?(hooks)
+    File.symlink(File.join(@config.gitlab_shell_path, 'hooks'), hooks)
+  end
 
   def initialize
     @command = ARGV.shift
@@ -77,14 +84,8 @@ class GitlabProjects
     $logger.info "Adding project #{@project_name} at <#{full_path}>."
     FileUtils.mkdir_p(full_path, mode: 0770)
     cmd = %W(git --git-dir=#{full_path} init --bare)
-    system(*cmd) && create_hooks(full_path)
+    system(*cmd) && self.class.create_hooks(full_path)
     FileUtils.chmod_R 0770, full_path
-  end
-
-  def create_hooks(path)
-    hooks = File.join(path, 'hooks')
-    FileUtils.rm_rf(hooks) if File.exists?(hooks)
-    File.symlink(File.join(@config.gitlab_shell_path, 'hooks'), hooks)
   end
 
   def rm_project
@@ -95,10 +96,32 @@ class GitlabProjects
   # Import project via git clone --bare
   # URL must be publicly cloneable
   def import_project
+    # Skip import if repo already exists
+    return false if File.exists?(full_path)
+
     @source = ARGV.shift
+
+    # timeout for clone
+    timeout = (ARGV.shift || 120).to_i
     $logger.info "Importing project #{@project_name} from <#{@source}> to <#{full_path}>."
     cmd = %W(git clone --bare -- #{@source} #{full_path})
-    system(*cmd) && create_hooks(full_path)
+
+    pid = Process.spawn(*cmd)
+
+    begin
+      Timeout.timeout(timeout) do
+        Process.wait(pid)
+      end
+    rescue Timeout::Error
+      $logger.error "Importing project #{@project_name} from <#{@source}> failed due to timeout."
+
+      Process.kill('KILL', pid)
+      Process.wait
+      FileUtils.rm_rf(full_path)
+      false
+    else
+      self.class.create_hooks(full_path)
+    end
   end
 
   # Move repository from one directory to another
@@ -174,7 +197,7 @@ class GitlabProjects
 
     $logger.info "Forking project from <#{full_path}> to <#{full_destination_path}>."
     cmd = %W(git clone --bare -- #{full_path} #{full_destination_path})
-    system(*cmd) && create_hooks(full_destination_path)
+    system(*cmd) && self.class.create_hooks(full_destination_path)
   end
 
   def update_head

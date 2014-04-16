@@ -31,8 +31,8 @@ describe GitlabProjects do
     it "should create a branch" do
       gl_projects_create.exec
       gl_projects.exec
-      branch_ref = `cd #{tmp_repo_path} && git rev-parse test_branch`.strip
-      master_ref = `cd #{tmp_repo_path} && git rev-parse master`.strip
+      branch_ref = capture_in_tmp_repo(%W(git rev-parse test_branch))
+      master_ref = capture_in_tmp_repo(%W(git rev-parse master))
       branch_ref.should == master_ref
     end
   end
@@ -49,9 +49,9 @@ describe GitlabProjects do
     it "should remove a branch" do
       gl_projects_create.exec
       gl_projects_create_branch.exec
-      branch_ref = `cd #{tmp_repo_path} && git rev-parse test_branch`.strip
+      branch_ref = capture_in_tmp_repo(%W(git rev-parse test_branch))
       gl_projects.exec
-      branch_del = `cd #{tmp_repo_path} && git rev-parse test_branch`.strip
+      branch_del = capture_in_tmp_repo(%W(git rev-parse test_branch))
       branch_del.should_not == branch_ref
     end
   end
@@ -65,8 +65,8 @@ describe GitlabProjects do
     it "should create a tag" do
       gl_projects_create.exec
       gl_projects.exec
-      tag_ref = `cd #{tmp_repo_path} && git rev-parse test_tag`.strip
-      master_ref = `cd #{tmp_repo_path} && git rev-parse master`.strip
+      tag_ref = capture_in_tmp_repo(%W(git rev-parse test_tag))
+      master_ref = capture_in_tmp_repo(%W(git rev-parse master))
       tag_ref.should == master_ref
     end
   end
@@ -83,9 +83,9 @@ describe GitlabProjects do
     it "should remove a branch" do
       gl_projects_create.exec
       gl_projects_create_tag.exec
-      branch_ref = `cd #{tmp_repo_path} && git rev-parse test_tag`.strip
+      branch_ref = capture_in_tmp_repo(%W(git rev-parse test_tag))
       gl_projects.exec
-      branch_del = `cd #{tmp_repo_path} && git rev-parse test_tag`.strip
+      branch_del = capture_in_tmp_repo(%W(git rev-parse test_tag))
       branch_del.should_not == branch_ref
     end
   end
@@ -95,7 +95,7 @@ describe GitlabProjects do
 
     it "should create a directory" do
       gl_projects.stub(system: true)
-      gl_projects.stub(create_hooks: true)
+      GitlabProjects.stub(create_hooks: true)
       gl_projects.exec
       File.exists?(tmp_repo_path).should be_true
     end
@@ -103,7 +103,7 @@ describe GitlabProjects do
     it "should receive valid cmd" do
       valid_cmd = ['git', "--git-dir=#{tmp_repo_path}", 'init', '--bare']
       gl_projects.should_receive(:system).with(*valid_cmd).and_return(true)
-      gl_projects.should_receive(:create_hooks).with(tmp_repo_path)
+      GitlabProjects.should_receive(:create_hooks).with(tmp_repo_path)
       gl_projects.exec
     end
 
@@ -179,8 +179,8 @@ describe GitlabProjects do
 
     before do
       FileUtils.mkdir_p(tmp_repo_path)
-      system("git init --bare #{tmp_repo_path}")
-      system("touch #{tmp_repo_path}/refs/heads/stable")
+      system(*%W(git init --bare #{tmp_repo_path}))
+      FileUtils.touch(File.join(tmp_repo_path, "refs/heads/stable"))
       File.read(File.join(tmp_repo_path, 'HEAD')).strip.should == 'ref: refs/heads/master'
     end
 
@@ -196,17 +196,47 @@ describe GitlabProjects do
   end
 
   describe :import_project do
-    let(:gl_projects) { build_gitlab_projects('import-project', repo_name, 'https://github.com/randx/six.git') }
+    context 'success import' do
+      let(:gl_projects) { build_gitlab_projects('import-project', repo_name, 'https://github.com/randx/six.git') }
 
-    it "should import a repo" do
-      gl_projects.exec
-      File.exists?(File.join(tmp_repo_path, 'HEAD')).should be_true
+      it { gl_projects.exec.should be_true }
+
+      it "should import a repo" do
+        gl_projects.exec
+        File.exists?(File.join(tmp_repo_path, 'HEAD')).should be_true
+      end
+
+      it "should log an import-project event" do
+        message = "Importing project #{repo_name} from <https://github.com/randx/six.git> to <#{tmp_repo_path}>."
+        $logger.should_receive(:info).with(message)
+        gl_projects.exec
+      end
     end
 
-    it "should log an import-project event" do
-      message = "Importing project #{repo_name} from <https://github.com/randx/six.git> to <#{tmp_repo_path}>."
-      $logger.should_receive(:info).with(message)
-      gl_projects.exec
+    context 'already exists' do
+      let(:gl_projects) { build_gitlab_projects('import-project', repo_name, 'https://github.com/randx/six.git') }
+
+      it 'should import only once' do
+        gl_projects.exec.should be_true
+        gl_projects.exec.should be_false
+      end
+    end
+
+    context 'timeout' do
+      let(:gl_projects) { build_gitlab_projects('import-project', repo_name, 'https://github.com/gitlabhq/gitlabhq.git', '1') }
+
+      it { gl_projects.exec.should be_false }
+
+      it "should not import a repo" do
+        gl_projects.exec
+        File.exists?(File.join(tmp_repo_path, 'HEAD')).should be_false
+      end
+
+      it "should log an import-project event" do
+        message = "Importing project #{repo_name} from <https://github.com/gitlabhq/gitlabhq.git> failed due to timeout."
+        $logger.should_receive(:error).with(message)
+        gl_projects.exec
+      end
     end
   end
 
@@ -327,5 +357,9 @@ describe GitlabProjects do
 
   def repo_name
     'gitlab-ci.git'
+  end
+
+  def capture_in_tmp_repo(cmd)
+    IO.popen(cmd, chdir: tmp_repo_path).read.strip
   end
 end
