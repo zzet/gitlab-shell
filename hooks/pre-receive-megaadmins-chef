@@ -1,6 +1,7 @@
 #!/bin/bash
 
-GIT_REPO_URI=/var/git/repositories/megaadmins/chef.git
+export KNIFE_HOME=/etc/chef
+GIT_REPO_UR=I/var/git/repositories/megaadmins/chef.git
 HOOK_DIR=/var/git/gitlab-shell/hooks
 CHEF_SERVER=mgmt01.undev.cc
 KNIFE="/opt/chef-client/bin/knife-undev"
