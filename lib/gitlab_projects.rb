@@ -20,7 +20,7 @@ class GitlabProjects
   def self.create_hooks(path)
     hooks = File.join(path, 'hooks')
     FileUtils.rm_rf(hooks) if File.exists?(hooks)
-    File.symlink(File.join(@config.gitlab_shell_path, 'hooks'), hooks)
+    File.symlink(File.join(GitlabConfig.new.gitlab_shell_path, 'hooks'), hooks)
   end
 
   def initialize
