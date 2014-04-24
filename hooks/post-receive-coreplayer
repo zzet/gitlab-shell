@@ -51,7 +51,7 @@ function rebuild_player() {
   $GIT_CMD tag -f $tag &>/dev/null || {
     exit_fail "Recreate tag"
   }
-  $GIT_CMD push origin $tag &>/dev/null || {
+  $GIT_CMD push -f origin $tag &>/dev/null || {
     exit_fail "Push new tag to origin"
   }
 
