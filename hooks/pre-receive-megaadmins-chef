@@ -89,7 +89,7 @@ while read old_version new_version ref_name; do
 
   if [ ${#changed_cookbooks[@]} -gt 0 ] || [ ${#changed_roles[@]} -gt 0 ] || [ ${#changed_envs[@]} -gt 0 ]; then
 
-    work_dir="/tmp/$$"
+    work_dir="/dev/shm/$$"
     mkdir -p $work_dir/git_repo
     git clone $GIT_REPO_URI $work_dir/git_repo &>/dev/null
     cd $work_dir/git_repo
