@@ -28,6 +28,7 @@ describe GitlabKeys do
 
     context "without file writing" do
       before { gitlab_keys.stub(:open) }
+      before { create_authorized_keys_fixture }
 
       it "should log an add-key event" do
         $logger.should_receive(:info).with('Adding key key-741 => "ssh-rsa AAAAB3NzaDAxx2E"')
@@ -96,7 +97,10 @@ describe GitlabKeys do
     end
 
     context "without file writing" do
-      before { Tempfile.stub(:open) }
+      before do
+        Tempfile.stub(:open)
+        gitlab_keys.stub(:lock).and_yield
+      end
 
       it "should log an rm-key event" do
         $logger.should_receive(:info).with('Removing key key-741')
@@ -145,6 +149,46 @@ describe GitlabKeys do
     end
   end
 
+  describe :lock do
+    before do
+      GitlabKeys.any_instance.stub(lock_file: tmp_lock_file_path)
+    end
+
+    it "should raise exception if operation lasts more then timeout" do
+      key = GitlabKeys.new
+      expect do
+        key.send :lock, 1 do
+          sleep 2
+        end
+      end.to raise_error
+    end
+
+    it "should actually lock file" do
+      $global = ""
+      key = GitlabKeys.new
+
+      thr1 = Thread.new do
+        key.send :lock do
+          # Put bigger sleep here to test if main thread will
+          # wait for lock file released before executing code
+          sleep 1
+          $global << "foo"
+        end
+      end
+
+      # make sure main thread start lock command after
+      # thread above
+      sleep 0.5
+
+      key.send :lock do
+        $global << "bar"
+      end
+
+      thr1.join
+      $global.should == "foobar"
+    end
+  end
+
   def build_gitlab_keys(*args)
     argv(*args)
     GitlabKeys.new
@@ -164,5 +208,9 @@ describe GitlabKeys do
 
   def tmp_authorized_keys_path
     File.join(GitlabConfig.new.gitlab_shell_path, 'tmp', 'authorized_keys')
+  end
+
+  def tmp_lock_file_path
+    tmp_authorized_keys_path + '.lock'
   end
 end
