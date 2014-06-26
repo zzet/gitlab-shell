@@ -1,3 +1,19 @@
+v1.9.6
+  - Explicitly require 'timeout' from the standard library
+
+v1.9.5
+  - Put authorized_keys.lock in the same directory as authorized_keys
+  - Use lock file when add new entries to authorized_keys
+
+v1.9.4
+  - Use lock file when modify authorized_keys
+
+v1.9.3
+  - Ignore force push detection for new branch or branch remove push
+
+v1.9.2
+  - Add support for force push detection 
+
 v1.9.1
   - Update hook sends branch and tag name 
 

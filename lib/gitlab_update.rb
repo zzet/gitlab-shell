@@ -22,12 +22,21 @@ class GitlabUpdate
     @newrev  = ARGV[2]
   end
 
+  def forced_push?
+    if @oldrev !~ /00000000/ && @newrev !~ /00000000/
+      missed_refs = IO.popen(%W(git rev-list #{@oldrev} ^#{@newrev})).read
+      missed_refs.split("\n").size > 0
+    else
+      false
+    end
+  end
+
   def exec
     # reset GL_ID env since we already
     # get value from it
     ENV['GL_ID'] = nil
 
-    if api.allowed?('git-receive-pack', @repo_name, @actor, @ref_name, @oldrev, @newrev)
+    if api.allowed?('git-receive-pack', @repo_name, @actor, @ref_name, @oldrev, @newrev, forced_push?)
       update_redis
       exit 0
     else
